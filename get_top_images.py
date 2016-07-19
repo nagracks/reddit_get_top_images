@@ -153,9 +153,9 @@ def links_from_a(url):
     # Get image links
     for link in soup_ob.find_all('div', {'class':'post-image'}):
         # Link comes as //imgur.com/id
-        # Make it http://imgur.com/id
+        # Make it https://imgur.com/id
         try:
-            full_link = 'http:' + link.img.get('src')
+            full_link = 'https:' + link.img.get('src')
             yield full_link
         except:
             pass
