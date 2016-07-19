@@ -62,31 +62,17 @@ class TopImageRetreiver(object):
         """
         for submission in submissions:
             url = submission.url
-            # Url conditions
+            # If it is simple image
             if url.endswith(('jpg', 'jpeg', 'png', 'gif')): 
                 yield url
             elif 'imgur' in url and '/gallery/' in url:
-                # Wrong solution for '/gallery' contain url
-                ## Get url id, it will use to make image url
-                #img_id = url.split('/')[-1]
-                ## Raw url, with incorrect extension. 
-                ## Need to find correct extension
-                #raw_url = 'http://i.imgur.com/' + img_id + '.jpg'
-                ## Response object
-                #r = requests.get(raw_url)
-                ## Get correct file extension from headers
-                #extension = r.headers['content-type'].split('/')[-1]
-                ## Make full image url
-                #pic_url = ("http://i.imgur.com/"
-                #           "{img}.{ext}".format(img=img_id,
-                #                                ext=extension))
-                #yield pic_url
-
                 # Call to func
-                links_from_gallery(url)
+                for link in links_from_gallery(url):
+                    yield link
             elif 'imgur' in url and '/a/' in url:
                 # Call to func
-                links_from_a(url)
+                for link in links_from_a(url):
+                    yield link
             # if url without extension
             elif 'imgur.com' in url:
                 ## Raw url, with incorrect extension. 
@@ -163,13 +149,16 @@ def links_from_a(url):
     # Response object
     r = requests.get(url).text
     # Soup object
-    soup_ob = BeautifulSoup(r, 'lxml')
+    soup_ob = BeautifulSoup(r, 'html.parser')
     # Get image links
     for link in soup_ob.find_all('div', {'class':'post-image'}):
         # Link comes as //imgur.com/id
         # Make it http://imgur.com/id
-        full_link = 'http:' + link.img.get('src')
-        yield full_link
+        try:
+            full_link = 'http:' + link.img.get('src')
+            yield full_link
+        except:
+            pass
 
 def links_from_gallery(url):
     """Get links from imgur.com/gallery
@@ -180,13 +169,16 @@ def links_from_gallery(url):
     # Response object
     r = requests.get(url).text
     # Soup object
-    soup_ob = BeautifulSoup(r, 'lxml')
+    soup_ob = BeautifulSoup(r, 'html.parser')
     # Get image links
     for link in soup_ob.find_all('div', {'class':'post-images'}):
         # Link comes as //imgur.com/id
         # Make it http://imgur.com/id
-        full_link = 'http:' + link.img.get('src')
-        yield full_link
+        try:
+            full_link = 'http:' + link.img.get('src')
+            yield full_link
+        except:
+            pass
 
 def download_it(url, sub_reddit_name):
     """Download the url
