@@ -51,46 +51,49 @@ class TopImageRetreiver(object):
         r = praw.Reddit(user_agent="Get top images")
         # subreddit object
         self.submissions = r.get_subreddit(subreddit)
-        # Get url maximum limit
+        # Maximum URL limit
         self.limit = limit
 
     def _yield_urls(self, submissions):
-        """Generate image urls
+        """Generate image urls with various url conditions
 
         :submissions: iterable, subreddit submissions
         :returns: generator, urls
         """
         for submission in submissions:
             url = submission.url
-            # If it is simple image
-            if url.endswith(('jpg', 'jpeg', 'png', 'gif')): 
+            # Need image extensions
+            img_ext = ('jpg', 'jpeg', 'png', 'gif')
+            # Url conditions
+            # If URL simply ends with needed extension
+            # then generate it
+            if url.endswith(img_ext): 
                 yield url
-            elif 'imgur' in url and '/gallery/' in url:
-                # Call to func
-                for link in links_from_gallery(url):
+            # If URL contain '/gallery/' or '/a/'
+            # Call function made to extract images from it
+            elif 'imgur' in url and ('/a/' or '/gallery/') in url:
+                for link in links_from_imgur(url):
                     yield link
-            elif 'imgur' in url and '/a/' in url:
-                # Call to func
-                for link in links_from_a(url):
-                    yield link
-            # if url without extension
-            elif 'imgur.com' in url:
-                ## Raw url, with incorrect extension. 
-                ## Need to find correct extension
+            # If url without extension
+            else:
+                # Make raw url, with incorrect extension. 
                 raw_url = url + '.jpg'
-                # Response object
+                # Raw response object
                 r = requests.get(raw_url)
                 # Get correct extension
                 extension = r.headers['content-type'].split('/')[-1]
-                # Make full link
-                full_link = "{url}.{ext}".format(url=url, ext=extension)
-                yield full_link
+                # If it is the extension we need
+                # Make link
+                if extension in img_ext:
+                    link = "{url}.{ext}".format(url=url, ext=extension)
+                    yield link
 
     def get_from_hour(self):
         """Get top images by hour
         :returns: generator, urls
         """
         # Get top from hour
+        # Generator object
         get_from_hour = self.submissions.get_top_from_hour(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_hour)
@@ -100,6 +103,7 @@ class TopImageRetreiver(object):
         :returns: generator, urls
         """
         # Get top from day
+        # Generator object
         get_from_day = self.submissions.get_top_from_day(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_day)
@@ -109,6 +113,7 @@ class TopImageRetreiver(object):
         :returns: generator, urls 
         """
         # Get top from week
+        # Generator object
         get_from_week = self.submissions.get_top_from_week(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_week)
@@ -118,6 +123,7 @@ class TopImageRetreiver(object):
         :returns: generator, urls
         """
         # Get top from month
+        # Generator object
         get_from_month = self.submissions.get_top_from_month(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_month)
@@ -127,6 +133,7 @@ class TopImageRetreiver(object):
         :returns: generator, urls
         """
         # Get top from year
+        # Generator object
         get_from_year = self.submissions.get_top_from_year(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_year)
@@ -136,14 +143,15 @@ class TopImageRetreiver(object):
         :returns: generator, urls
         """
         # Get top from all
+        # Generator object
         get_from_all = self.submissions.get_top_from_all(limit=self.limit)
         # Get image links
         return self._yield_urls(get_from_all)
 
-def links_from_a(url):
-    """Get links from imgur.com/a/
+def links_from_imgur(url):
+    """Get links from imgur.com/a/ and imgur.com/gallery/
 
-    :url: url contain '/a/'
+    :url: url contain 'imgur.com/a/' or 'imgur.com/gallery/'
     :returns: generator, links
     """
     # Response object
@@ -151,34 +159,26 @@ def links_from_a(url):
     # Soup object
     soup_ob = BeautifulSoup(r, 'html.parser')
     # Get image links
-    for link in soup_ob.find_all('div', {'class':'post-image'}):
-        # Link comes as //imgur.com/id
-        # Make it https://imgur.com/id
-        try:
-            full_link = 'https:' + link.img.get('src')
-            yield full_link
-        except:
-            pass
-
-def links_from_gallery(url):
-    """Get links from imgur.com/gallery
-
-    :url: url contain '/gallery'
-    :returns: generators, links
-    """
-    # Response object
-    r = requests.get(url).text
-    # Soup object
-    soup_ob = BeautifulSoup(r, 'html.parser')
-    # Get image links
-    for link in soup_ob.find_all('div', {'class':'post-images'}):
-        # Link comes as //imgur.com/id
-        # Make it http://imgur.com/id
-        try:
-            full_link = 'http:' + link.img.get('src')
-            yield full_link
-        except:
-            pass
+    if '/a/' in url:
+        for link in soup_ob.find_all('div', {'class':'post-image'}):
+            try:
+                img_link = link.img.get('src')
+                # img_link comes as //imgur.com/id
+                # Make it https://imgur.com/id
+                full_link = 'https:' + img_link 
+                yield full_link
+            except:
+                pass
+    if '/gallery/' in url:
+        for link in soup_ob.find_all('div', {'class':'post-images'}):
+            try:
+                img_link = link.img.get('src')
+                # img_link comes as //imgur.com/id
+                # Make it https://imgur.com/id
+                full_link = 'https:' + img_link 
+                yield full_link
+            except:
+                pass
 
 def download_it(url, sub_reddit_name):
     """Download the url
@@ -234,7 +234,7 @@ def parse_args():
                         dest='limit',
                         type=int,
                         action='store',
-                        help="maximum limit of getting images")
+                        help="Maximum URL limit")
     
     # Boolean args
     parser.add_argument('--hour', '-1',
