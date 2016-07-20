@@ -17,7 +17,7 @@ top_from_all
 
 __author__    = "nagracks"
 __date__      = "18-07-2016"
-__license__   = "MIT"
+__license__   = "GPL3"
 __copyright__ = "Copyright © 2016 nagracks"
 
 import argparse
