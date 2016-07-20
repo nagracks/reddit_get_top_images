@@ -22,10 +22,12 @@ __copyright__ = "Copyright © 2016 nagracks"
 
 import argparse
 import os
+from time import sleep
 
 # External modules
 import praw
 import requests
+import tqdm
 from bs4 import BeautifulSoup
 
 class TopImageRetreiver(object):
@@ -211,12 +213,18 @@ def download_it(url, sub_reddit_name):
         print("{file_name} already downloaded".format(file_name=file_name))
     else:
         print("Downloading to {save_path}".format(save_path=save_path))
-        # Start download
+        # Response object
         r = requests.get(url, stream=True)
+        # Start download
+        # Shows progress bar
         with open(save_path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
+            for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
+                            total=(int(r.headers['content-length'])//1024),
+                            unit='KB')):
                 if chunk:
                     f.write(chunk)
+                else:
+                    return
 
 def parse_args():
     """Parse args with argparse
