@@ -212,8 +212,8 @@ def download_it(url, subreddit_name):
         # Shows progress bar
         with open(save_path, 'wb') as f:
             for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
-                            total=(int(r.headers['content-length'])//1024),
-                            unit='KB')):
+                         total=(int(r.headers.get('content-length', 0))//1024),
+                         unit='KB')):
                 if chunk:
                     f.write(chunk)
                 else:
