@@ -38,13 +38,8 @@ class TopImageRetreiver(object):
     :subreddit: subreddit name
     :limit: max limit of getting urls, default set to 15
 
-    methods:
-    * get_from_hour
-    * get_from_day
-    * get_from_week
-    * get_from_month
-    * get_from_year
-    * get_from_all
+    method:
+    * get_top_submissions
 
     """
 
@@ -55,66 +50,25 @@ class TopImageRetreiver(object):
         self.submissions = r.get_subreddit(subreddit)
         # Maximum URL limit
         self.limit = limit
+        # self.period = period
+        self.timeframe = {'h': 'get_top_from_hour',
+                          'd': 'get_top_from_day',
+                          'w': 'get_top_from_week',
+                          'm': 'get_top_from_month',
+                          'y': 'get_top_from_year',
+                          'a': 'get_top_from_all'}
 
-    def get_from_hour(self):
-        """Get top images by hour
-        :returns: generator, urls
+    def get_top_submissions(self, period):
         """
-        # Get top from hour
-        # Generator object
-        get_from_hour = self.submissions.get_top_from_hour(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_hour)
-
-    def get_from_day(self):
-        """Get top images by day
-        :returns: generator, urls
+        Get top images by the selected period.
+        :period: string, key for self.timeframe dict
+        :return: generator, urls
         """
-        # Get top from day
-        # Generator object
-        get_from_day = self.submissions.get_top_from_day(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_day)
-
-    def get_from_week(self):
-        """Get top images by week
-        :returns: generator, urls
-        """
-        # Get top from week
-        # Generator object
-        get_from_week = self.submissions.get_top_from_week(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_week)
-
-    def get_from_month(self):
-        """Get top images by month
-        :returns: generator, urls
-        """
-        # Get top from month
-        # Generator object
-        get_from_month = self.submissions.get_top_from_month(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_month)
-
-    def get_from_year(self):
-        """Get top images by year
-        :returns: generator, urls
-        """
-        # Get top from year
-        # Generator object
-        get_from_year = self.submissions.get_top_from_year(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_year)
-
-    def get_from_all(self):
-        """Get top images by all
-        :returns: generator, urls
-        """
-        # Get top from all
-        # Generator object
-        get_from_all = self.submissions.get_top_from_all(limit=self.limit)
-        # Get image links
-        return _yield_urls(get_from_all)
+        # take first lower letter of a period
+        # if letter not in the self.timeframe, gets top from the week
+        time_period = self.timeframe.get(period[0].lower(), 'get_top_from_week')
+        get_top = getattr(self.submissions, time_period)(limit=self.limit)
+        return _yield_urls(get_top)
 
 
 def _yield_urls(submissions):
@@ -224,44 +178,24 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                  "any subreddit")
-    # Optional args
+
     parser.add_argument('--subreddit', '-s',
                         dest='subreddit',
                         action='store',
                         required=True,
                         help="Name of the subreddit")
+    parser.add_argument('--period', '-p',
+                        dest='period',
+                        action='store',
+                        required=True,
+                        help="Period of time from which you want images:\n"
+                             "[h]our, [d]ay, [m]onth, [y]ear, or [a]ll")
     parser.add_argument('--limit', '-l',
                         dest='limit',
                         type=int,
                         action='store',
                         help="Maximum URL limit")
-    
-    # Boolean args
-    parser.add_argument('--hour', '-1',
-                        dest='hour',
-                        action='store_true',
-                        help="Get top images from *hour*")
-    parser.add_argument('--day','-d',
-                        dest='day',
-                        action='store_true',
-                        help="Get top images from *day*")
-    parser.add_argument('--week', '-w',
-                        dest='week',
-                        action='store_true',
-                        help="Get top images from *week*")
-    parser.add_argument('--month', '-m',
-                        dest='month',
-                        action='store_true',
-                        help="Get top images from *month*")
-    parser.add_argument('--year', '-y',
-                        dest='year',
-                        action='store_true',
-                        help="Get top images from *year*")
-    parser.add_argument('--all', '-a',
-                        dest='all',
-                        action='store_true',
-                        help="Get top images from *all*")
-    
+
     return parser.parse_args()
 
 
@@ -276,22 +210,5 @@ if __name__ == "__main__":
     else:
         tir = TopImageRetreiver(args.subreddit)
 
-    # If args.name true then download
-    if args.hour:
-        for url in tir.get_from_hour():
-            download_it(url, args.subreddit)
-    elif args.day:
-        for url in tir.get_from_day():
-            download_it(url, args.subreddit)
-    elif args.week:
-        for url in tir.get_from_week():
-            download_it(url, args.subreddit)
-    elif args.month:
-        for url in tir.get_from_month():
-            download_it(url, args.subreddit)
-    elif args.year:
-        for url in tir.get_from_year():
-            download_it(url, args.subreddit)
-    elif args.all:
-        for url in tir.get_from_all():
-            download_it(url, args.subreddit)
+    for url in tir.get_top_submissions(args.period):
+        download_it(url, args.subreddit)
