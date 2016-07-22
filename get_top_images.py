@@ -191,9 +191,7 @@ def download_it(url, subreddit_name):
     home_dir = os.path.expanduser('~')
     # Make download path
     path = os.path.join(home_dir, 'reddit_pics')
-    if os.path.exists(path):
-        pass
-    else:
+    if not os.path.exists(path):
         try:
             os.mkdir(path)
         except OSError as e:
