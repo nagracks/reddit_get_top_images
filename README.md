@@ -19,7 +19,7 @@ import get_top_images as gi
 
 sub_reddit = 'getmotivated'
 tir = gi.TopImageRetreiver(sub_reddit, limit=5)
-for url in tir.get_from_week():
+for url in tir.get_top_submissions('w'):
     gi.download_it(url, sub_reddit)
 ```
 
@@ -30,8 +30,8 @@ for url in tir.get_from_week():
 **Here are the full arguments for CLI use:**
 
 ```
-usage: get_top_images.py [-h] --subreddit SUBREDDIT [--limit LIMIT] [--hour]
-                         [--day] [--week] [--month] [--year] [--all]
+usage: get_top_images.py [-h] --subreddit SUBREDDIT --period PERIOD
+                         [--limit LIMIT]
 
 Download top pics from any subreddit
 
@@ -39,14 +39,11 @@ optional arguments:
   -h, --help            show this help message and exit
   --subreddit SUBREDDIT, -s SUBREDDIT
                         Name of the subreddit
+  --period PERIOD, -p PERIOD
+                        Period of time from which you want images: [h]our,
+                        [d]ay, [m]onth, [y]ear, or [a]ll
   --limit LIMIT, -l LIMIT
-                        maximum limit of getting images
-  --hour, -1            Get top images from *hour*
-  --day, -d             Get top images from *day*
-  --week, -w            Get top images from *week*
-  --month, -m           Get top images from *month*
-  --year, -y            Get top images from *year*
-  --all, -a             Get top images from *all*
+                        Maximum URL limit
 ```
 
 Contributing
