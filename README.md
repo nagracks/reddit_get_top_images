@@ -25,7 +25,7 @@ for url in tir.get_top_submissions('w'):
 
 **Here is a typical CLI usecase that will do the same:**
 
-`python get_top_images.py -s getmotivated --week`
+`python get_top_images.py -s getmotivated -p w`
 
 **Here are the full arguments for CLI use:**
 
