@@ -31,7 +31,6 @@ from bs4 import BeautifulSoup
 
 
 class TopImageRetreiver(object):
-
     """TopImageRetreiver Class
 
     Constructor args:
@@ -40,7 +39,6 @@ class TopImageRetreiver(object):
 
     method:
     * get_top_submissions
-
     """
 
     def __init__(self, subreddit, limit=15):
@@ -69,7 +67,6 @@ class TopImageRetreiver(object):
         time_period = self.timeframe.get(period[0].lower(), 'get_top_from_week')
         get_top = getattr(self.submissions, time_period)(limit=self.limit)
         return _yield_urls(get_top)
-
 
 def _yield_urls(submissions):
     """Generate image urls with various url conditions
@@ -104,7 +101,6 @@ def _yield_urls(submissions):
             if extension in img_ext:
                 link = "{url}.{ext}".format(url=url, ext=extension)
                 yield link
-
 
 def links_from_imgur(url):
     """Get links from imgur.com/a/ and imgur.com/gallery/
@@ -147,7 +143,6 @@ def make_path(filename, dst=''):
                 os.mkdir(path)
             except OSError as e:
                 print(e)
-
     # Full file save path
     save_path = os.path.join(path, filename)
     return save_path
@@ -180,26 +175,24 @@ def download_it(url):
         # Shows progress bar
         with open(save_path, 'wb') as f:
             for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
-                         total=(int(r.headers.get('content-length', 0))//1024),
-                         unit='KB')):
+                        total=(int(r.headers.get('content-length', 0))//1024),
+                        unit='KB')):
                 if chunk:
                     f.write(chunk)
                 else:
                     return
-
 
 def parse_args():
     """Parse args with argparse
     :returns: args
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
-                                                 "any subreddit")
-
+                                                "any subreddit")
     parser.add_argument('--destination', '-d',
                         dest='dst',
                         action='store',
+                        metavar='PATH',
                         help="Destiantion path")
-    
     parser.add_argument('--subreddit', '-s',
                         dest='subreddit',
                         action='store',
@@ -208,21 +201,28 @@ def parse_args():
     parser.add_argument('--period', '-p',
                         dest='period',
                         action='store',
-                        required=True,
-                        help="Period of time from which you want images:\n"
-                             "[h]our, [d]ay, [m]onth, [y]ear, or [a]ll")
+                        default='w',
+                        metavar='h|d|m|y|a',
+                        help= "[h]our, [d]ay, [m]onth, [y]ear, or [a]ll. "
+                              "Period of time from which you want images. "
+                              "Default to 'get_top_from_week'")
     parser.add_argument('--limit', '-l',
                         dest='limit',
+                        metavar='int',
                         type=int,
                         action='store',
-                        help="Maximum URL limit")
-
+                        help="Maximum URL limit. Default to 15")
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     # Commandline args
     args = parse_args()
+
+    # Handle control+c nicely
+    import signal
+    def exit_(signum, frame):
+        os.sys.exit(1)
+    signal.signal(signal.SIGINT, exit_)
 
     # Args conditions
     # Initialise object
