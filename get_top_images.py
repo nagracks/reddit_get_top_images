@@ -128,8 +128,31 @@ def links_from_imgur(url):
             except:
                 pass
 
+def make_path(filename, dst=''):
+    """Make download path
 
-def download_it(url, subreddit_name):
+    :filename: name of file which ends the path
+    :dst: destination path, default to ''
+    :returns: path, full filename path
+    """
+    # Get home directory
+    home_dir = os.path.expanduser('~')
+    # Make download directory path
+    if dst:
+        path = dst
+    else:
+        path = os.path.join(home_dir, 'reddit_pics')
+        if not os.path.exists(path):
+            try:
+                os.mkdir(path)
+            except OSError as e:
+                print(e)
+
+    # Full file save path
+    save_path = os.path.join(path, filename)
+    return save_path
+
+def download_it(url):
     """Download the url
 
     :url: downloadable url address
@@ -139,20 +162,13 @@ def download_it(url, subreddit_name):
     # This helps to make random filename
     url_chars = url.split('/')[-1][-10:]
     # Make random filename with subreddit name and random chars
-    file_name = "{reddit_name}_{chars}".format(reddit_name=subreddit_name,
-                                               chars=url_chars)
-    # Get home directory
-    home_dir = os.path.expanduser('~')
-    # Make download path
-    path = os.path.join(home_dir, 'reddit_pics')
-    if not os.path.exists(path):
-        try:
-            os.mkdir(path)
-        except OSError as e:
-            print(e)
-
-    # File save path
-    save_path = os.path.join(path, file_name)
+    file_name = "{name}_{chars}".format(name=args.subreddit, chars=url_chars)
+    # Make save math with condition
+    # If user specified path or not
+    if args.dst:
+        save_path = make_path(file_name, args.dst)
+    else:
+        save_path = make_path(file_name)
 
     if os.path.exists(save_path):
         print("{file_name} already downloaded".format(file_name=file_name))
@@ -179,6 +195,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                  "any subreddit")
 
+    parser.add_argument('--destination', '-d',
+                        dest='dst',
+                        action='store',
+                        help="Destiantion path")
+    
     parser.add_argument('--subreddit', '-s',
                         dest='subreddit',
                         action='store',
@@ -211,4 +232,4 @@ if __name__ == "__main__":
         tir = TopImageRetreiver(args.subreddit)
 
     for url in tir.get_top_submissions(args.period):
-        download_it(url, args.subreddit)
+        download_it(url)
