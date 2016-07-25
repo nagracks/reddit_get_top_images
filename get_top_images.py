@@ -195,7 +195,8 @@ def parse_args():
                         dest='dst',
                         action='store',
                         metavar='PATH',
-                        help="Destiantion path")
+                        help="Destiantion path. By default it saves to "
+                             "$HOME/reddit_pics")
     parser.add_argument('--subreddit', '-s',
                         dest='subreddit',
                         action='store',
