@@ -65,6 +65,7 @@ class TopImageRetreiver(object):
         # take first lower letter of a period
         # if letter not in the self.timeframe, gets top from the week
         time_period = self.timeframe.get(period[0].lower(), 'get_top_from_week')
+        # It is like self.submissions.get_top_from_period(limit=self.limit)
         get_top = getattr(self.submissions, time_period)(limit=self.limit)
         return _yield_urls(get_top)
 
@@ -134,6 +135,8 @@ def _make_path(filename, dst=''):
     # Get home directory
     home_dir = os.path.expanduser('~')
     # Make download directory path
+    # If destination is not provided
+    # The default saving path is $HOME/reddit_pics
     if dst:
         path = dst
     else:
@@ -158,8 +161,8 @@ def _download_it(url):
     url_chars = url.split('/')[-1][-10:]
     # Make random filename with subreddit name and random chars
     file_name = "{name}_{chars}".format(name=args.subreddit, chars=url_chars)
-    # Make save math with condition
-    # If user specified path or not
+    # Make save path with condition
+    # If user has specified destination path or not
     if args.dst:
         save_path = _make_path(file_name, args.dst)
     else:
@@ -214,7 +217,6 @@ def parse_args():
                         help="Maximum URL limit. Default to 15")
     return parser.parse_args()
 
-
 if __name__ == "__main__":
     # Commandline args
     args = parse_args()
@@ -231,5 +233,6 @@ if __name__ == "__main__":
     else:
         tir = TopImageRetreiver(args.subreddit)
 
+    # Download images from selected time period
     for url in tir.get_top_submissions(args.period):
         _download_it(url)
