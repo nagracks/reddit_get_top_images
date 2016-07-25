@@ -30,23 +30,21 @@ for url in tir.get_top_submissions('w'):
 **Here are the full arguments for CLI use:**
 
 ```
-usage: get_top_images.py [-h] [--destination PATH] --subreddit SUBREDDIT
-                         [--period h|d|m|y|a] [--limit int]
+usage: get_top_images.py [-h] --subreddit SUBREDDIT [--period] [--limit]
+                         [--destination]
 
 Download top pics from any subreddit
 
 optional arguments:
   -h, --help            show this help message and exit
-  --destination PATH, -d PATH
-                        Destiantion path. By default it saves to
-                        $HOME/reddit_pics
   --subreddit SUBREDDIT, -s SUBREDDIT
                         Name of the subreddit
-  --period h|d|m|y|a, -p h|d|m|y|a
-                        [h]our, [d]ay, [m]onth, [y]ear, or [a]ll. Period of
-                        time from which you want images. Default to
-                        'get_top_from_week'
-  --limit int, -l int   Maximum URL limit. Default to 15
+  --period , -p         [h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll.
+                        Period of time from which you want images. Default to
+                        'get_top_from_[w]eek'
+  --limit , -l          Maximum URL limit. Default to 15
+  --destination , -d    Destiantion path. By default it saves to
+                        $HOME/reddit_pics
 ```
 
 Contributing
