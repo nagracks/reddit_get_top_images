@@ -38,7 +38,8 @@ Download top pics from any subreddit
 optional arguments:
   -h, --help            show this help message and exit
   --destination PATH, -d PATH
-                        Destiantion path
+                        Destiantion path. By default it saves to
+                        $HOME/reddit_pics
   --subreddit SUBREDDIT, -s SUBREDDIT
                         Name of the subreddit
   --period h|d|m|y|a, -p h|d|m|y|a
