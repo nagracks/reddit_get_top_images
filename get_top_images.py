@@ -191,12 +191,6 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                 "any subreddit")
-    parser.add_argument('--destination', '-d',
-                        dest='dst',
-                        action='store',
-                        metavar='PATH',
-                        help="Destiantion path. By default it saves to "
-                             "$HOME/reddit_pics")
     parser.add_argument('--subreddit', '-s',
                         dest='subreddit',
                         action='store',
@@ -206,16 +200,22 @@ def parse_args():
                         dest='period',
                         action='store',
                         default='w',
-                        metavar='h|d|m|y|a',
-                        help= "[h]our, [d]ay, [m]onth, [y]ear, or [a]ll. "
+                        metavar='',
+                        help= "[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. "
                               "Period of time from which you want images. "
-                              "Default to 'get_top_from_week'")
+                              "Default to 'get_top_from_[w]eek'")
     parser.add_argument('--limit', '-l',
                         dest='limit',
-                        metavar='int',
+                        metavar='',
                         type=int,
                         action='store',
                         help="Maximum URL limit. Default to 15")
+    parser.add_argument('--destination', '-d',
+                        dest='dst',
+                        action='store',
+                        metavar='',
+                        help="Destiantion path. By default it saves to "
+                             "$HOME/reddit_pics")
     return parser.parse_args()
 
 if __name__ == "__main__":
