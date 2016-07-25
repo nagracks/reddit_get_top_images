@@ -86,7 +86,7 @@ def _yield_urls(submissions):
         # If URL contain '/gallery/' or '/a/'
         # Call function made to extract images from it
         elif 'imgur' in url and ('/a/' in url or '/gallery/' in url):
-            for link in links_from_imgur(url):
+            for link in _links_from_imgur(url):
                 yield link
         # If url without extension
         else:
@@ -102,7 +102,7 @@ def _yield_urls(submissions):
                 link = "{url}.{ext}".format(url=url, ext=extension)
                 yield link
 
-def links_from_imgur(url):
+def _links_from_imgur(url):
     """Get links from imgur.com/a/ and imgur.com/gallery/
 
     :url: url contain 'imgur.com/a/' or 'imgur.com/gallery/'
@@ -124,7 +124,7 @@ def links_from_imgur(url):
             except:
                 pass
 
-def make_path(filename, dst=''):
+def _make_path(filename, dst=''):
     """Make download path
 
     :filename: name of file which ends the path
@@ -147,7 +147,7 @@ def make_path(filename, dst=''):
     save_path = os.path.join(path, filename)
     return save_path
 
-def download_it(url):
+def _download_it(url):
     """Download the url
 
     :url: downloadable url address
@@ -161,9 +161,9 @@ def download_it(url):
     # Make save math with condition
     # If user specified path or not
     if args.dst:
-        save_path = make_path(file_name, args.dst)
+        save_path = _make_path(file_name, args.dst)
     else:
-        save_path = make_path(file_name)
+        save_path = _make_path(file_name)
 
     if os.path.exists(save_path):
         print("{file_name} already downloaded".format(file_name=file_name))
@@ -214,10 +214,10 @@ def parse_args():
                         help="Maximum URL limit. Default to 15")
     return parser.parse_args()
 
+
 if __name__ == "__main__":
     # Commandline args
     args = parse_args()
-
     # Handle control+c nicely
     import signal
     def exit_(signum, frame):
@@ -232,4 +232,4 @@ if __name__ == "__main__":
         tir = TopImageRetreiver(args.subreddit)
 
     for url in tir.get_top_submissions(args.period):
-        download_it(url)
+        _download_it(url)
