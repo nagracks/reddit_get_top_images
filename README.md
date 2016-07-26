@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/nagracks/reddit_get_top_images.svg)](https://gitter.im/nagracks/reddit_get_top_images?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 # reddit_get_top_images
 
 > `reddit_get_top_images` is a script that can be used to download
