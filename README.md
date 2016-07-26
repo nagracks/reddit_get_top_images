@@ -15,7 +15,7 @@ Usage
 -----
 
 **Here is a typical API usecase that will get all the top images**
-**of www.reddit.com/r/getmotived from last week.**
+**of www.reddit.com/r/getmotivated from last week.**
 ```
 import get_top_images as gi
 
