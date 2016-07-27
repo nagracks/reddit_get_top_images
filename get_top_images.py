@@ -41,12 +41,13 @@ class TopImageRetreiver(object):
     * get_top_submissions
     """
 
-    def __init__(self, subreddit = 'aww', limit = 15, period = 'w', dst = ''):
+    def __init__(self, subreddit='aww', limit=15, period='w', dst=''):
         # praw Python Reddit API wrapper
         r = praw.Reddit(user_agent="Get top images")
         # subreddit object
         self.subreddit = subreddit
-        self.submissions = r.get_subreddit(subreddit, fetch = True) # This line will throw an exception if the subreddit doesn't exist
+        # This line will throw an exception if the subreddit doesn't exist
+        self.submissions = r.get_subreddit(subreddit, fetch=True)
         # open to how you want to handle it
         self.period = period
         self.dst = dst
@@ -68,8 +69,9 @@ class TopImageRetreiver(object):
         """
         # take first lower letter of a period
         # if letter not in the self.timeframe, gets top from the week
-        get_top = self.timeframe.get(self.period)(limit = self.limit)
+        get_top = self.timeframe.get(self.period)(limit=self.limit)
         return _yield_urls(get_top)
+
 
 def _yield_urls(submissions):
     """Generate image urls with various url conditions
@@ -109,6 +111,7 @@ def _yield_urls(submissions):
                 link = "{url}.{ext}".format(url=url, ext=extension)
                 yield link
 
+
 def _links_from_imgur(url):
     """Get links from imgur.com/a/ and imgur.com/gallery/
 
@@ -129,6 +132,7 @@ def _links_from_imgur(url):
             yield full_link
         except:
             pass
+
 
 def _make_path(filename, dst=''):
     """Make download path
@@ -158,6 +162,7 @@ def _make_path(filename, dst=''):
     save_path = os.path.join(path, filename)
     return save_path
 
+
 def download_it(url, tir):
     """Download the url
 
@@ -183,32 +188,33 @@ def download_it(url, tir):
         # Shows progress bar
         with open(save_path, 'wb') as f:
             for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
-                        total=(int(r.headers.get('content-length', 0))//1024),
-                        unit='KB')):
+                                    total=(int(r.headers.get('content-length', 0)) // 1024),
+                                    unit='KB')):
                 if chunk:
                     f.write(chunk)
                 else:
                     return
+
 
 def parse_args():
     """Parse args with argparse
     :returns: args
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
-                                                "any subreddit")
+                                                 "any subreddit")
     parser.add_argument('--subreddit', '-s',
-                        default = 'aww',       # name of default subreddit
+                        default='aww',  # name of default subreddit
                         help="Name of the subreddit")
     parser.add_argument('--period', '-p',
                         default='w',
-                        choices = ['h', 'd', 'w', 'm', 'y', 'a'],
-                        help= "[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. "
-                              "Period of time from which you want images. "
-                              "Default to 'get_top_from_[w]eek'")
+                        choices=['h', 'd', 'w', 'm', 'y', 'a'],
+                        help="[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. "
+                             "Period of time from which you want images. "
+                             "Default to 'get_top_from_[w]eek'")
     parser.add_argument('--limit', '-l',
-                        metavar = 'N',
+                        metavar='N',
                         type=int,
-                        default = 15,
+                        default=15,
                         help="Maximum URL limit. Default to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
@@ -216,13 +222,18 @@ def parse_args():
                              "$HOME/reddit_pics")
     return parser.parse_args()
 
+
 if __name__ == "__main__":
     # Commandline args
     args = parse_args()
     # Handle control+c nicely
     import signal
+
+
     def exit_(signum, frame):
         os.sys.exit(1)
+
+
     signal.signal(signal.SIGINT, exit_)
 
     # Args conditions
