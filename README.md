@@ -22,7 +22,7 @@ import get_top_images as gi
 sub_reddit = 'getmotivated'
 tir = gi.TopImageRetreiver(sub_reddit, limit=5)
 for url in tir.get_top_submissions():
-    _download_it(url, tir)
+    gi.download_it(url, tir)
 ```
 
 **Here is a typical CLI usecase that will do the same:**
@@ -47,7 +47,7 @@ optional arguments:
                         'get_top_from_[w]eek'
   --limit N, -l N       Maximum URL limit. Default to 15
   --destination DST, -d DST
-                        Destination path. By default it saves to
+                        Destiantion path. By default it saves to
                         $HOME/reddit_pics
 ```
 
