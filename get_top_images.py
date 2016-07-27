@@ -158,7 +158,7 @@ def _make_path(filename, dst=''):
     save_path = os.path.join(path, filename)
     return save_path
 
-def _download_it(url, tir):
+def download_it(url, tir):
     """Download the url
 
     :url: downloadable url address
@@ -231,4 +231,4 @@ if __name__ == "__main__":
 
     # Download images from selected time period
     for url in tir.get_top_submissions():
-        _download_it(url, tir)
+        download_it(url, tir)
