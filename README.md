@@ -21,8 +21,8 @@ import get_top_images as gi
 
 sub_reddit = 'getmotivated'
 tir = gi.TopImageRetreiver(sub_reddit, limit=5)
-for url in tir.get_top_submissions('w'):
-    print(url)
+for url in tir.get_top_submissions():
+    _download_it(url, tir)
 ```
 
 **Here is a typical CLI usecase that will do the same:**
@@ -32,8 +32,8 @@ for url in tir.get_top_submissions('w'):
 **Here are the full arguments for CLI use:**
 
 ```
-usage: get_top_images.py [-h] --subreddit SUBREDDIT [--period] [--limit]
-                         [--destination]
+usage: get_top_images.py [-h] [--subreddit SUBREDDIT] [--period {h,d,w,m,y,a}]
+                         [--limit N] [--destination DST]
 
 Download top pics from any subreddit
 
@@ -41,11 +41,13 @@ optional arguments:
   -h, --help            show this help message and exit
   --subreddit SUBREDDIT, -s SUBREDDIT
                         Name of the subreddit
-  --period , -p         [h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll.
+  --period {h,d,w,m,y,a}, -p {h,d,w,m,y,a}
+                        [h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll.
                         Period of time from which you want images. Default to
                         'get_top_from_[w]eek'
-  --limit , -l          Maximum URL limit. Default to 15
-  --destination , -d    Destiantion path. By default it saves to
+  --limit N, -l N       Maximum URL limit. Default to 15
+  --destination DST, -d DST
+                        Destination path. By default it saves to
                         $HOME/reddit_pics
 ```
 

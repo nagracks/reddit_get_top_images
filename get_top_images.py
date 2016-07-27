@@ -3,8 +3,8 @@
 
 """
 Reddit Get Top Images
-It is a Python script which allows you to download top images from 
-any subreddit. 
+It is a Python script which allows you to download top images from
+any subreddit.
 
 It allows you to download top pics by categories
 top_from_hour
@@ -41,22 +41,26 @@ class TopImageRetreiver(object):
     * get_top_submissions
     """
 
-    def __init__(self, subreddit, limit=15):
+    def __init__(self, subreddit = 'aww', limit = 15, period = 'w', dst = ''):
         # praw Python Reddit API wrapper
         r = praw.Reddit(user_agent="Get top images")
         # subreddit object
-        self.submissions = r.get_subreddit(subreddit)
+        self.subreddit = subreddit
+        self.submissions = r.get_subreddit(subreddit, fetch = True) # This line will throw an exception if the subreddit doesn't exist
+        # open to how you want to handle it
+        self.period = period
+        self.dst = dst
         # Maximum URL limit
         self.limit = limit
         # self.period = period
-        self.timeframe = {'h': 'get_top_from_hour',
-                          'd': 'get_top_from_day',
-                          'w': 'get_top_from_week',
-                          'm': 'get_top_from_month',
-                          'y': 'get_top_from_year',
-                          'a': 'get_top_from_all'}
+        self.timeframe = {'h': self.submissions.get_top_from_hour,
+                          'd': self.submissions.get_top_from_day,
+                          'w': self.submissions.get_top_from_week,
+                          'm': self.submissions.get_top_from_month,
+                          'y': self.submissions.get_top_from_year,
+                          'a': self.submissions.get_top_from_all}
 
-    def get_top_submissions(self, period):
+    def get_top_submissions(self):
         """
         Get top images by the selected period.
         :period: string, key for self.timeframe dict
@@ -64,9 +68,7 @@ class TopImageRetreiver(object):
         """
         # take first lower letter of a period
         # if letter not in the self.timeframe, gets top from the week
-        time_period = self.timeframe.get(period[0].lower(), 'get_top_from_week')
-        # It is like self.submissions.get_top_from_period(limit=self.limit)
-        get_top = getattr(self.submissions, time_period)(limit=self.limit)
+        get_top = self.timeframe.get(self.period)(limit = self.limit)
         return _yield_urls(get_top)
 
 def _yield_urls(submissions):
@@ -94,9 +96,13 @@ def _yield_urls(submissions):
             # Make raw url, with incorrect extension.
             raw_url = url + '.jpg'
             # Raw response object
-            r = requests.get(raw_url)
-            # Get correct extension
-            extension = r.headers['content-type'].split('/')[-1]
+            try:
+                r = requests.get(raw_url)
+                r.raise_for_status()
+                extension = r.headers['content-type'].split('/')[-1]
+            except Exception as e:
+                extension = ''
+
             # If it is the extension we need
             # Make link
             if extension in img_ext:
@@ -114,16 +120,15 @@ def _links_from_imgur(url):
     # Soup object
     soup_ob = BeautifulSoup(r, 'html.parser')
     # Get image links
-    if '/a/' in url or '/gallery/' in url:
-        for link in soup_ob.find_all('div', {'class': 'post-image'}):
-            try:
-                img_link = link.img.get('src')
-                # img_link comes as //imgur.com/id
-                # Make it https://imgur.com/id
-                full_link = 'https:' + img_link
-                yield full_link
-            except:
-                pass
+    for link in soup_ob.find_all('div', {'class': 'post-image'}):
+        try:
+            img_link = link.img.get('src')
+            # img_link comes as //imgur.com/id
+            # Make it https://imgur.com/id
+            full_link = 'https:' + img_link
+            yield full_link
+        except:
+            pass
 
 def _make_path(filename, dst=''):
     """Make download path
@@ -138,19 +143,22 @@ def _make_path(filename, dst=''):
     # If destination is not provided
     # The default saving path is $HOME/reddit_pics
     if dst:
-        path = dst
+        if os.path.isabs(dst):
+            path = dst
+        else:
+            path = os.path.join(home_dir, dst)
     else:
         path = os.path.join(home_dir, 'reddit_pics')
-        if not os.path.exists(path):
-            try:
-                os.mkdir(path)
-            except OSError as e:
-                print(e)
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except OSError as e:
+            print(e)
     # Full file save path
     save_path = os.path.join(path, filename)
     return save_path
 
-def _download_it(url):
+def _download_it(url, tir):
     """Download the url
 
     :url: downloadable url address
@@ -160,13 +168,10 @@ def _download_it(url):
     # This helps to make random filename
     url_chars = url.split('/')[-1][-10:]
     # Make random filename with subreddit name and random chars
-    file_name = "{name}_{chars}".format(name=args.subreddit, chars=url_chars)
+    file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
     # Make save path with condition
     # If user has specified destination path or not
-    if args.dst:
-        save_path = _make_path(file_name, args.dst)
-    else:
-        save_path = _make_path(file_name)
+    save_path = _make_path(file_name, tir.dst)
 
     if os.path.exists(save_path):
         print("{file_name} already downloaded".format(file_name=file_name))
@@ -192,28 +197,21 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                 "any subreddit")
     parser.add_argument('--subreddit', '-s',
-                        dest='subreddit',
-                        action='store',
-                        required=True,
+                        default = 'aww',       # name of default subreddit
                         help="Name of the subreddit")
     parser.add_argument('--period', '-p',
-                        dest='period',
-                        action='store',
                         default='w',
-                        metavar='',
+                        choices = ['h', 'd', 'w', 'm', 'y', 'a'],
                         help= "[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. "
                               "Period of time from which you want images. "
                               "Default to 'get_top_from_[w]eek'")
     parser.add_argument('--limit', '-l',
-                        dest='limit',
-                        metavar='',
+                        metavar = 'N',
                         type=int,
-                        action='store',
+                        default = 15,
                         help="Maximum URL limit. Default to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
-                        action='store',
-                        metavar='',
                         help="Destiantion path. By default it saves to "
                              "$HOME/reddit_pics")
     return parser.parse_args()
@@ -229,11 +227,8 @@ if __name__ == "__main__":
 
     # Args conditions
     # Initialise object
-    if args.limit:
-        tir = TopImageRetreiver(args.subreddit, args.limit)
-    else:
-        tir = TopImageRetreiver(args.subreddit)
+    tir = TopImageRetreiver(args.subreddit, args.limit, args.period, args.dst)
 
     # Download images from selected time period
-    for url in tir.get_top_submissions(args.period):
-        _download_it(url)
+    for url in tir.get_top_submissions():
+        _download_it(url, tir)
