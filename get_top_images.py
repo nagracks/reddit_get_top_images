@@ -171,9 +171,14 @@ def download_it(url, tir):
     """
     # Splits to get some characters from in-url filename
     # This helps to make random filename
-    url_chars = url.split('/')[-1][-10:]
+    url_chars = url.split('/')[-1]
+    illegal_chars = '/?<>\\:*|"'
+    for char in illegal_chars:
+        url_chars = url_chars.replace(char, '')
     # Make random filename with subreddit name and random chars
     file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
+    if len(file_name) > 255:
+        file_name = file_name[-255:]
     # Make save path with condition
     # If user has specified destination path or not
     save_path = _make_path(file_name, tir.dst)
