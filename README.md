@@ -47,7 +47,7 @@ optional arguments:
                         'get_top_from_[w]eek'
   --limit N, -l N       Maximum URL limit. Default to 15
   --destination DST, -d DST
-                        Destiantion path. By default it saves to
+                        Destination path. By default it saves to
                         $HOME/reddit_pics
 ```
 

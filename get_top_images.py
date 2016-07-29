@@ -223,7 +223,7 @@ def parse_args():
                         help="Maximum URL limit. Default to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
-                        help="Destiantion path. By default it saves to "
+                        help="Destination path. By default it saves to "
                              "$HOME/reddit_pics")
     return parser.parse_args()
 
