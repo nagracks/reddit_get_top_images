@@ -22,6 +22,7 @@ __copyright__ = "Copyright © 2016 nagracks"
 
 import argparse
 import os
+import random
 
 # External modules
 import praw
@@ -171,14 +172,11 @@ def download_it(url, tir):
     """
     # Splits to get some characters from in-url filename
     # This helps to make random filename
-    url_chars = url.split('/')[-1]
-    illegal_chars = '/?<>\\:*|"'
-    for char in illegal_chars:
-        url_chars = url_chars.replace(char, '')
+
+    trans_table = str.maketrans('?&', 'XX')
+    url_chars = (url.split('/')[-1][-10:]).translate(trans_table)
     # Make random filename with subreddit name and random chars
     file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
-    if len(file_name) > 255:
-        file_name = file_name[-255:]
     # Make save path with condition
     # If user has specified destination path or not
     save_path = _make_path(file_name, tir.dst)
@@ -193,8 +191,8 @@ def download_it(url, tir):
         # Shows progress bar
         with open(save_path, 'wb') as f:
             for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
-                                    total=(int(r.headers.get('content-length', 0)) // 1024),
-                                    unit='KB')):
+                       total=(int(r.headers.get('content-length', 0)) // 1024),
+                       unit='KB')):
                 if chunk:
                     f.write(chunk)
                 else:
