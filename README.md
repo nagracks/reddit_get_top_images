@@ -14,6 +14,8 @@
 Usage
 -----
 
+![](https://zippy.gfycat.com/CelebratedLimpingFallowdeer.gif)
+
 **Here is a typical API usecase that will get all the top images**
 **of www.reddit.com/r/getmotivated from last week.**
 ```
