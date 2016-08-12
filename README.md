@@ -18,7 +18,9 @@ Usage
 
 **Here is a typical API usecase that will get all the top images**
 **of www.reddit.com/r/getmotivated from last week.**
-```
+
+```py
+
 import get_top_images as gi
 
 sub_reddit = 'getmotivated'
@@ -29,11 +31,16 @@ for url in tir.get_top_submissions():
 
 **Here is a typical CLI usecase that will do the same:**
 
-`python get_top_images.py -s getmotivated -p w`
+
+```bash 
+$ python get_top_images.py -s getmotivated -p w
+```
 
 **Here are the full arguments for CLI use:**
 
-```
+```bash
+$ python get_top_images.py -h
+
 usage: get_top_images.py [-h] [--subreddit SUBREDDIT] [--period {h,d,w,m,y,a}]
                          [--limit N] [--destination DST]
 
