@@ -39,22 +39,21 @@ $ python get_top_images.py -s getmotivated -p w
 **Here are the full arguments for CLI use:**
 
 ```bash
-$ python get_top_images.py -h
-
-usage: get_top_images.py [-h] [--subreddit SUBREDDIT] [--period {h,d,w,m,y,a}]
-                         [--limit N] [--destination DST]
+usage: get_top_images.py [-h] [--subreddits SUBREDDITS [SUBREDDITS ...]]
+                         [--period {h,d,w,m,y,a}] [--limit N]
+                         [--destination DST]
 
 Download top pics from any subreddit
 
 optional arguments:
   -h, --help            show this help message and exit
-  --subreddit SUBREDDIT, -s SUBREDDIT
-                        Name of the subreddit
+  --subreddits SUBREDDITS [SUBREDDITS ...], -s SUBREDDITS [SUBREDDITS ...]
+                        Name of the subreddits
   --period {h,d,w,m,y,a}, -p {h,d,w,m,y,a}
                         [h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll.
                         Period of time from which you want images. Default to
                         'get_top_from_[w]eek'
-  --limit N, -l N       Maximum URL limit. Default to 15
+  --limit N, -l N       Maximum URL limit per subreddit. Defaults to 15
   --destination DST, -d DST
                         Destination path. By default it saves to
                         $HOME/reddit_pics
