@@ -205,9 +205,10 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                  "any subreddit")
-    parser.add_argument('--subreddit', '-s',
-                        default='aww',  # name of default subreddit
-                        help="Name of the subreddit")
+    parser.add_argument('--subreddits', '-s',
+                        default=['aww'],  # name of default subreddit
+                        nargs='+', # accept one or more subreddit nameS
+                        help="Name of the subreddits")
     parser.add_argument('--period', '-p',
                         default='w',
                         choices=['h', 'd', 'w', 'm', 'y', 'a'],
@@ -218,7 +219,7 @@ def parse_args():
                         metavar='N',
                         type=int,
                         default=15,
-                        help="Maximum URL limit. Default to 15")
+                        help="Maximum URL limit per subreddit. Defaults to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
                         help="Destination path. By default it saves to "
@@ -239,10 +240,13 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, exit_)
 
-    # Args conditions
-    # Initialise object
-    tir = TopImageRetreiver(args.subreddit, args.limit, args.period, args.dst)
+    
+    for subreddit in args.subreddits:
 
-    # Download images from selected time period
-    for url in tir.get_top_submissions():
-        download_it(url, tir)
+        # Args conditions
+        # Initialise object
+        tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
+    
+        # Download images from selected time period
+        for url in tir.get_top_submissions():
+            download_it(url, tir)
