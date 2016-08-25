@@ -142,23 +142,21 @@ def _make_path(filename, dst=''):
     :dst: destination path, default to ''
     :returns: path, full filename path
     """
-    # Get home directory
-    home_dir = os.path.expanduser('~')
+
     # Make download directory path
     # If destination is not provided
     # The default saving path is $HOME/reddit_pics
     if dst:
-        if os.path.isabs(dst):
-            path = dst
-        else:
-            path = os.path.join(home_dir, dst)
+        # Expand ~ if it exists
+        path = os.path.expanduser(dst)
+        # make it an absolute path
+        path = os.path.abspath(path)
     else:
-        path = os.path.join(home_dir, 'reddit_pics')
-    if not os.path.exists(path):
-        try:
-            os.mkdir(path)
-        except OSError as e:
-            print(e)
+        path = os.path.expanduser('~/reddit_pics')
+
+    # make this folder and any intermediate folders
+    # requires python 3.2+
+    os.makedirs(path, exist_ok=True)
     # Full file save path
     save_path = os.path.join(path, filename)
     return save_path
@@ -206,7 +204,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                  "any subreddit")
     parser.add_argument('--subreddits', '-s',
-                        default=['aww'],  # name of default subreddit
+                        default=['earthporn', 'cityporn'],  # names of default subreddits
                         nargs='+', # accept one or more subreddit nameS
                         help="Name of the subreddits")
     parser.add_argument('--period', '-p',
@@ -222,8 +220,9 @@ def parse_args():
                         help="Maximum URL limit per subreddit. Defaults to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
+                        default='~/Pictures/reddit_pics',
                         help="Destination path. By default it saves to "
-                             "$HOME/reddit_pics")
+                             "$HOME/Pictures/reddit_pics")
     return parser.parse_args()
 
 
@@ -240,13 +239,13 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, exit_)
 
-    
+
     for subreddit in args.subreddits:
 
         # Args conditions
         # Initialise object
         tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
-    
+
         # Download images from selected time period
         for url in tir.get_top_submissions():
             download_it(url, tir)
