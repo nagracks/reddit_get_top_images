@@ -11,10 +11,12 @@ import requests
 
 header = """\
 
-Lead by: [nagracks](http://github.com/nagracks)
+**Lead by**: [nagracks](http://github.com/nagracks)
 
 
-==============================================
+----------------------------------------------------
+Thanks to the following people for their contributions
+----------------------------------------------------
 
 """
 url = "https://api.github.com/repos/nagracks/reddit_get_top_images/contributors"
