@@ -10,8 +10,11 @@ import os
 import requests
 
 header = """\
-Lead by:
-* (nagracks)[http://github.com/nagracks]
+
+Lead by: [nagracks](http://github.com/nagracks)
+
+
+==============================================
 
 """
 url = "https://api.github.com/repos/nagracks/reddit_get_top_images/contributors"
@@ -23,7 +26,7 @@ lines = []
 for i in contributors:
     url = (i.get('html_url'))
     username = i.get('login')
-    lines.append('* ({})[{}] '.format(username, url))
+    lines.append('* [{}]({}) '.format(username, url))
 
 text = header + '\n'.join(lines)
 
