@@ -1,8 +1,10 @@
 
-Lead by: [nagracks](http://github.com/nagracks)
+**Lead by**: [nagracks](http://github.com/nagracks)
 
 
-==============================================
+----------------------------------------------------
+Thanks to the following people for their contributions
+----------------------------------------------------
 
 * [nagracks](https://github.com/nagracks) 
 * [narimiran](https://github.com/narimiran) 
