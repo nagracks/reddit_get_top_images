@@ -2,22 +2,22 @@
 
 # reddit_get_top_images
 
-> `reddit_get_top_images` is a script that can be used to download
-> all the top images from any subreddit of http://www.reddit.com.
+> `reddit_get_top_images` is a script that can be used to download all
+> the top images from any subreddit of http://www.reddit.com.
 
-> It can be adjusted to get images from any segment of time,
-> like images from the last hour, day, or week etc.
+> It can be adjusted to get images from any segment of time, like images
+> from the last hour, day, or week etc.
 
-> The script will create a folder in your $home directory
-> called `reddit_pics`.
+> The script will create a folder in your $home directory called
+> `reddit_pics`.
 
 Usage
 -----
 
 ![](https://zippy.gfycat.com/CelebratedLimpingFallowdeer.gif)
 
-**Here is a typical API usecase that will get all the top images**
-**of www.reddit.com/r/getmotivated from last week.**
+**Here is a typical API usecase that will get all the top images of
+www.reddit.com/r/getmotivated from last week.**
 
 ```py
 
@@ -56,13 +56,16 @@ optional arguments:
   --limit N, -l N       Maximum URL limit per subreddit. Defaults to 15
   --destination DST, -d DST
                         Destination path. By default it saves to
-                        $HOME/reddit_pics
+                        $HOME/Pictures/reddit_pics
 ```
 
 Contributing
 ------------
 
-This project is intended as a beginner friendly collaborative code, and anyone that wants to add, extend or otherwise improve this code is free to do so. Even if they have never contributed to another repository before.
+This project is intended as a beginner friendly collaborative code, and
+anyone that wants to add, extend or otherwise improve this code is free
+to do so. Even if they have never contributed to another repository
+before.
 
 LICENSE
 ------
