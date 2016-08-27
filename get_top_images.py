@@ -203,10 +203,10 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description="Download top pics from "
                                                  "any subreddit")
-    parser.add_argument('--subreddits', '-s',
-                        default=['earthporn', 'cityporn'],  # names of default subreddits
-                        nargs='+', # accept one or more subreddit nameS
-                        help="Name of the subreddits")
+    parser.add_argument('--subreddit', '-s',
+                        default=['earthporn', 'cityporn'],
+                        nargs='+',
+                        help="Name of the subreddit")
     parser.add_argument('--period', '-p',
                         default='w',
                         choices=['h', 'd', 'w', 'm', 'y', 'a'],
@@ -220,9 +220,9 @@ def parse_args():
                         help="Maximum URL limit per subreddit. Defaults to 15")
     parser.add_argument('--destination', '-d',
                         dest='dst',
-                        default='~/Pictures/reddit_pics',
+                        default='~/reddit_pics',
                         help="Destination path. By default it saves to "
-                             "$HOME/Pictures/reddit_pics")
+                             "$HOME/reddit_pics")
     return parser.parse_args()
 
 
@@ -238,10 +238,7 @@ if __name__ == "__main__":
 
 
     signal.signal(signal.SIGINT, exit_)
-
-
-    for subreddit in args.subreddits:
-
+    for subreddit in args.subreddit:
         # Args conditions
         # Initialise object
         tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
