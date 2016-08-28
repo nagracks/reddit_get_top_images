@@ -35,26 +35,21 @@ class TopImageRetreiver(object):
     """TopImageRetreiver Class
 
     Constructor args:
-    :subreddit: subreddit name
-    :limit: max limit of getting urls, default set to 15
+    :subreddit: str, subreddit name
+    :limit: int, max limit of getting urls, default set to 15
+    :period: str, period of time
 
     method:
     * get_top_submissions
     """
 
     def __init__(self, subreddit='aww', limit=15, period='w', dst=''):
-        # praw Python Reddit API wrapper
         r = praw.Reddit(user_agent="Get top images")
-        # subreddit object
         self.subreddit = subreddit
-        # This line will throw an exception if the subreddit doesn't exist
         self.submissions = r.get_subreddit(subreddit, fetch=True)
-        # open to how you want to handle it
         self.period = period
         self.dst = dst
-        # Maximum URL limit
         self.limit = limit
-        # self.period = period
         self.timeframe = {'h': self.submissions.get_top_from_hour,
                           'd': self.submissions.get_top_from_day,
                           'w': self.submissions.get_top_from_week,
@@ -63,13 +58,13 @@ class TopImageRetreiver(object):
                           'a': self.submissions.get_top_from_all}
 
     def get_top_submissions(self):
+        """Get top images from selected time period
+
+        :returns: generator, urls
         """
-        Get top images by the selected period.
-        :period: string, key for self.timeframe dict
-        :return: generator, urls
-        """
-        # take first lower letter of a period
-        # if letter not in the self.timeframe, gets top from the week
+        # Take first lower letter of a provided time period
+        # `self.period` and generate urls. If letter not in the
+        # self.timeframe, gets top from the week
         get_top = self.timeframe.get(self.period)(limit=self.limit)
         return _yield_urls(get_top)
 
@@ -77,37 +72,34 @@ class TopImageRetreiver(object):
 def _yield_urls(submissions):
     """Generate image urls with various url conditions
 
+    Functions used:
+    * _links_from_imgur(url)
+
     :submissions: iterable, subreddit submissions
     :returns: generator, urls
     """
     for submission in submissions:
         url = submission.url
-        # Need image extensions
+        # Needed image extensions
         img_ext = ('jpg', 'jpeg', 'png', 'gif')
-        # Url conditions
-        # If URL simply ends with needed extension
-        # then generate it
+        # If url ends with needed image extension then generate urls or
+        # if URL contain `/gallery/` or `/a/` in it then generate urls
+        # from `_links_from_imgur(url)`.
+        # or else if url is without any image extension then guess url
+        # extension by getting content-type headers
         if url.endswith(img_ext):
             yield url
-        # If URL contain '/gallery/' or '/a/'
-        # Call function made to extract images from it
         elif 'imgur' in url and ('/a/' in url or '/gallery/' in url):
             for link in _links_from_imgur(url):
                 yield link
-        # If url without extension
         else:
-            # Make raw url, with incorrect extension.
             raw_url = url + '.jpg'
-            # Raw response object
             try:
                 r = requests.get(raw_url)
                 r.raise_for_status()
                 extension = r.headers['content-type'].split('/')[-1]
             except Exception as e:
                 extension = ''
-
-            # If it is the extension we need
-            # Make link
             if extension in img_ext:
                 link = "{url}.{ext}".format(url=url, ext=extension)
                 yield link
@@ -116,14 +108,11 @@ def _yield_urls(submissions):
 def _links_from_imgur(url):
     """Get links from imgur.com/a/ and imgur.com/gallery/
 
-    :url: url contain 'imgur.com/a/' or 'imgur.com/gallery/'
+    :url: str, url contain 'imgur.com/a/' or 'imgur.com/gallery/'
     :returns: generator, links
     """
-    # Response object
     r = requests.get(url).text
-    # Soup object
     soup_ob = BeautifulSoup(r, 'html.parser')
-    # Get image links
     for link in soup_ob.find_all('div', {'class': 'post-image'}):
         try:
             img_link = link.img.get('src')
@@ -138,23 +127,16 @@ def _links_from_imgur(url):
 def _make_path(filename, dst=''):
     """Make download path
 
-    :filename: name of file which ends the path
-    :dst: destination path, default to ''
-    :returns: path, full filename path
+    :filename: str, name of file which ends the path
+    :dst: str, destination path, default to ''
+    :returns: str, full filename path
     """
-    # Make download directory path
-    # If destination is not provided
-    # The default saving path is $HOME/reddit_pics
     if dst:
-        # Expand ~ if it exists
         path = os.path.expanduser(dst)
     else:
         path = os.path.expanduser('~/reddit_pics')
 
-    # make this folder and any intermediate folders
-    # requires python 3.2+
     os.makedirs(path, exist_ok=True)
-    # Full file save path
     save_path = os.path.join(path, filename)
     return save_path
 
@@ -162,28 +144,24 @@ def _make_path(filename, dst=''):
 def download_it(url, tir):
     """Download the url
 
-    :url: downloadable url address
-    :subreddit_name
+    :url: str, downloadable url address
+    :tir: cls instance of TopImageRetreiver()
+    :returns: None
     """
-    # Splits to get some characters from in-url filename
-    # This helps to make random filename
-
-    trans_table = str.maketrans('?&', 'XX')
-    url_chars = (url.split('/')[-1][-10:]).translate(trans_table)
-    # Make random filename with subreddit name and random chars
+    # Splits url to get last 10 `characters` from `in-url filename`.
+    # This helps to make random filename by joining `subreddit` name and
+    # `in-url` filename characters
+    table = str.maketrans('?&', 'XX')
+    url_chars = (url.split('/')[-1][-10:]).translate(table)
     file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
-    # Make save path with condition
-    # If user has specified destination path or not
+    # Make save path with condition if user has specified destination
+    # path or not
     save_path = _make_path(file_name, tir.dst)
-
     if os.path.exists(save_path):
         print("{file_name} already downloaded".format(file_name=file_name))
     else:
         print("Downloading to {save_path}".format(save_path=save_path))
-        # Response object
         r = requests.get(url, stream=True)
-        # Start download
-        # Shows progress bar
         with open(save_path, 'wb') as f:
             for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
                        total=(int(r.headers.get('content-length', 0)) // 1024),
