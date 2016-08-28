@@ -72,6 +72,9 @@ class TopImageRetreiver(object):
 def download_it(url, tir):
     """Download the url
 
+    Functions used:
+    * _make_path(filename, dst='')
+
     :url: str, downloadable url address
     :tir: cls instance of TopImageRetreiver()
     :returns: None
