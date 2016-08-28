@@ -20,9 +20,9 @@ __date__      = "18-07-2016"
 __license__   = "GPL3"
 __copyright__ = "Copyright © 2016 nagracks"
 
-import argparse
 import os
 import random
+from argparse import ArgumentParser
 
 # External modules
 import praw
@@ -67,6 +67,54 @@ class TopImageRetreiver(object):
         # self.timeframe, gets top from the week
         get_top = self.timeframe.get(self.period)(limit=self.limit)
         return _yield_urls(get_top)
+
+
+def download_it(url, tir):
+    """Download the url
+
+    :url: str, downloadable url address
+    :tir: cls instance of TopImageRetreiver()
+    :returns: None
+    """
+    # Splits url to get last 10 `characters` from `in-url filename`.
+    # This helps to make random filename by joining `subreddit` name and
+    # `in-url` filename characters
+    table = str.maketrans('?&', 'XX')
+    url_chars = (url.split('/')[-1][-10:]).translate(table)
+    file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
+    # Make save path with condition if user has specified destination
+    # path or not
+    save_path = _make_path(file_name, tir.dst)
+    if os.path.exists(save_path):
+        print("{file_name} already downloaded".format(file_name=file_name))
+    else:
+        print("Downloading to {save_path}".format(save_path=save_path))
+        r = requests.get(url, stream=True)
+        with open(save_path, 'wb') as f:
+            for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
+                       total=(int(r.headers.get('content-length', 0)) // 1024),
+                       unit='KB')):
+                if chunk:
+                    f.write(chunk)
+                else:
+                    return
+
+
+def _make_path(filename, dst=''):
+    """Make download path
+
+    :filename: str, name of file which ends the path
+    :dst: str, destination path, default to ''
+    :returns: str, full filename path
+    """
+    if dst:
+        path = os.path.expanduser(dst)
+    else:
+        path = os.path.expanduser('~/reddit_pics')
+
+    os.makedirs(path, exist_ok=True)
+    save_path = os.path.join(path, filename)
+    return save_path
 
 
 def _yield_urls(submissions):
@@ -124,100 +172,49 @@ def _links_from_imgur(url):
             pass
 
 
-def _make_path(filename, dst=''):
-    """Make download path
-
-    :filename: str, name of file which ends the path
-    :dst: str, destination path, default to ''
-    :returns: str, full filename path
-    """
-    if dst:
-        path = os.path.expanduser(dst)
-    else:
-        path = os.path.expanduser('~/reddit_pics')
-
-    os.makedirs(path, exist_ok=True)
-    save_path = os.path.join(path, filename)
-    return save_path
-
-
-def download_it(url, tir):
-    """Download the url
-
-    :url: str, downloadable url address
-    :tir: cls instance of TopImageRetreiver()
-    :returns: None
-    """
-    # Splits url to get last 10 `characters` from `in-url filename`.
-    # This helps to make random filename by joining `subreddit` name and
-    # `in-url` filename characters
-    table = str.maketrans('?&', 'XX')
-    url_chars = (url.split('/')[-1][-10:]).translate(table)
-    file_name = "{name}_{chars}".format(name=tir.subreddit, chars=url_chars)
-    # Make save path with condition if user has specified destination
-    # path or not
-    save_path = _make_path(file_name, tir.dst)
-    if os.path.exists(save_path):
-        print("{file_name} already downloaded".format(file_name=file_name))
-    else:
-        print("Downloading to {save_path}".format(save_path=save_path))
-        r = requests.get(url, stream=True)
-        with open(save_path, 'wb') as f:
-            for chunk in (tqdm.tqdm(r.iter_content(chunk_size=1024),
-                       total=(int(r.headers.get('content-length', 0)) // 1024),
-                       unit='KB')):
-                if chunk:
-                    f.write(chunk)
-                else:
-                    return
-
-
-def parse_args():
+def _parse_args():
     """Parse args with argparse
     :returns: args
     """
-    parser = argparse.ArgumentParser(description="Download top pics from "
-                                                 "any subreddit")
-    parser.add_argument('--subreddit', '-s',
-                        default=['earthporn', 'cityporn'],
-                        nargs='+',
-                        help="Name of the subreddit")
-    parser.add_argument('--period', '-p',
-                        default='w',
-                        choices=['h', 'd', 'w', 'm', 'y', 'a'],
-                        help="[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. "
-                             "Period of time from which you want images. "
-                             "Default to 'get_top_from_[w]eek'")
-    parser.add_argument('--limit', '-l',
-                        metavar='N',
-                        type=int,
-                        default=15,
-                        help="Maximum URL limit per subreddit. Defaults to 15")
-    parser.add_argument('--destination', '-d',
-                        dest='dst',
-                        default='~/reddit_pics',
-                        help="Destination path. By default it saves to "
-                             "$HOME/reddit_pics")
+    parser = ArgumentParser(description="Download top pics from any subreddit")
+
+    parser.add_argument('--subreddit', '-s', 
+            default=['earthporn', 'cityporn'], 
+            nargs='+', 
+            help="Name of the subreddit")
+
+    parser.add_argument('--period', '-p', 
+            default='w',
+            choices=['h', 'd', 'w', 'm', 'y', 'a'],
+            help="[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. Period "
+                 "of time from which you want images. Default to "
+                 "'get_top_from_[w]eek'")
+
+    parser.add_argument('--limit', '-l', 
+            metavar='N', 
+            type=int,
+            default=15, 
+            help="Maximum URL limit per subreddit. Defaults to 15")
+
+    parser.add_argument('--destination', '-d', 
+            dest='dst', 
+            default='~/reddit_pics', 
+            help="Destination path. By default it saves to $HOME/reddit_pics")
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    # Commandline args
-    args = parse_args()
     # Handle control+c nicely
     import signal
-
-
     def exit_(signum, frame):
         os.sys.exit(1)
-
-
     signal.signal(signal.SIGINT, exit_)
-    for subreddit in args.subreddit:
-        # Args conditions
-        # Initialise object
-        tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
 
-        # Download images from selected time period
+    # Commandline args
+    args = _parse_args()
+
+    for subreddit in args.subreddit:
+        tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
         for url in tir.get_top_submissions():
             download_it(url, tir)
