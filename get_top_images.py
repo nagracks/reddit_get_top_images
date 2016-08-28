@@ -142,15 +142,12 @@ def _make_path(filename, dst=''):
     :dst: destination path, default to ''
     :returns: path, full filename path
     """
-
     # Make download directory path
     # If destination is not provided
     # The default saving path is $HOME/reddit_pics
     if dst:
         # Expand ~ if it exists
         path = os.path.expanduser(dst)
-        # make it an absolute path
-        path = os.path.abspath(path)
     else:
         path = os.path.expanduser('~/reddit_pics')
 
