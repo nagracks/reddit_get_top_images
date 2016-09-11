@@ -113,7 +113,8 @@ def _make_path(filename, dst=''):
     if dst:
         path = os.path.expanduser(dst)
     else:
-        path = os.path.expanduser('~/reddit_pics')
+        path = os.path.expanduser('~')
+        path = os.path.join(path, 'reddit_pics')
 
     os.makedirs(path, exist_ok=True)
     save_path = os.path.join(path, filename)
@@ -200,8 +201,7 @@ def _parse_args():
             help="Maximum URL limit per subreddit. Defaults to 15")
 
     parser.add_argument('--destination', '-d', 
-            dest='dst', 
-            default='~/reddit_pics', 
+            dest='dst',
             help="Destination path. By default it saves to $HOME/reddit_pics")
 
     return parser.parse_args()
