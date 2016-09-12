@@ -32,7 +32,7 @@ for url in tir.get_top_submissions():
 **Here is a typical CLI usecase that will do the same:**
 
 
-```bash 
+```bash
 $ python get_top_images.py -s getmotivated -p w
 ```
 
@@ -41,7 +41,8 @@ $ python get_top_images.py -s getmotivated -p w
 ```bash
 usage: get_top_images.py [-h] [--subreddit SUBREDDIT [SUBREDDIT ...]]
                          [--period {h,d,w,m,y,a}] [--limit N]
-                         [--destination DST]
+                         [--destination DESTINATION] [--separate_dirs]
+                         [--config CONFIG] [--write_config]
 
 Download top pics from any subreddit
 
@@ -54,9 +55,16 @@ optional arguments:
                         Period of time from which you want images. Default to
                         'get_top_from_[w]eek'
   --limit N, -l N       Maximum URL limit per subreddit. Defaults to 15
-  --destination DST, -d DST
+  --destination DESTINATION, -d DESTINATION
                         Destination path. By default it saves to
                         $HOME/reddit_pics
+  --separate_dirs, -sd  Make images from different subreddits save to
+                        subfolders of destination
+  --config CONFIG, -c CONFIG
+                        Use a JSON configuration file. Options in the file
+                        will be overridden by options passed in by argument
+  --write_config, -wc   Write all script arguments to the screen in JSON form
+                        and exit. Convenient for making configuration files
 ```
 
 Contributing
