@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -25,9 +25,12 @@ import random
 from argparse import ArgumentParser
 
 # External modules
+import argparse
+import json
 import praw
 import requests
 import tqdm
+import sys
 from bs4 import BeautifulSoup
 
 
@@ -67,6 +70,62 @@ class TopImageRetreiver(object):
         # self.timeframe, gets top from the week
         get_top = self.timeframe.get(self.period)(limit=self.limit)
         return _yield_urls(get_top)
+
+
+# Add a config subparser to the parser passed in
+# add a --config option that overwrites the defaults
+# and is overwritten by the passed in arguments
+class ArgumentConfig:
+    def __init__(self, parser: argparse.ArgumentParser):
+        self.parser = parser
+
+        self.parser.add_argument('--config', '-c',
+                                 nargs='?',
+                                 metavar='FILENAME')
+
+        # TODO: put this in subparser
+        self.parser.add_argument('--write_config', '-wc',
+                                 nargs='?',
+                                 metavar='FILENAME',
+                                 const='stdout')
+
+    def parse_args(self, *args, **kwargs):
+
+        # parse an empty list to get the defaults
+        defaults = vars(self.parser.parse_args([]))
+
+        passed_args = vars(self.parser.parse_args(*args, **kwargs))
+
+        # Only keep the args that aren't the default
+        passed_args = {key: value for (key, value) in passed_args.items()
+                       if (key in defaults and defaults[key] != value)}
+
+        config_path = passed_args.pop('config', None)
+        if config_path:
+            with open(config_path, 'r') as config_file:
+                configargs = json.load(config_file)
+        else:
+            configargs = dict()
+
+        # override defaults with config with passed args
+        options = {**defaults, **configargs, **passed_args}
+
+        # remove the config options from options. They're not needed any more
+        # and we don't want them serialized
+        options.pop('config', None)
+        options.pop('write_config', None)
+
+        # print the options (to file) if needed
+        config_dst = passed_args.pop('write_config', None)
+        if config_dst:
+            print(json.dumps(options, sort_keys=True, indent=4))
+            if config_dst != 'stdout':
+                with open(config_dst, 'w', encoding='utf-8') as config_file:
+                    print(json.dumps(options, sort_keys=True, indent=4), file=config_file)
+                    print('Current options saved to: %r' % config_dst)
+            sys.exit(0)
+
+        return argparse.Namespace(**options)
 
 
 def download_it(url, tir):
@@ -204,7 +263,10 @@ def _parse_args():
             dest='dst',
             help="Destination path. By default it saves to $HOME/reddit_pics")
 
-    return parser.parse_args()
+    # Add the config stuff
+    argconfig = ArgumentConfig(parser)
+
+    return argconfig.parse_args()
 
 
 if __name__ == "__main__":
