@@ -25,13 +25,13 @@ import random
 from argparse import ArgumentParser
 
 # External modules
+from bs4 import BeautifulSoup
 import argparse
 import json
 import praw
 import requests
-import tqdm
 import sys
-from bs4 import BeautifulSoup
+import tqdm
 
 
 class TopImageRetreiver(object):
@@ -72,22 +72,35 @@ class TopImageRetreiver(object):
         return _yield_urls(get_top)
 
 
-# Add a config subparser to the parser passed in
-# add a --config option that overwrites the defaults
-# and is overwritten by the passed in arguments
 class ArgumentConfig:
+    """ArgumentConfig class
+
+    add a --config option that overwrites the defaults
+    and is overwritten by the passed in arguments
+    add a --write-config option to print the current arguments
+    to the screen (or a file)
+
+    Constructor args:
+    :argparse.ArgumentParser
+
+    method:
+    * parse_args
+    """
     def __init__(self, parser: argparse.ArgumentParser):
         self.parser = parser
 
         self.parser.add_argument('--config', '-c',
                                  nargs='?',
-                                 metavar='FILENAME')
+                                 metavar='FILENAME',
+                                 help="read arguments from a JSON config. "
+                                      "Generate config with `--write-config`")
 
-        # TODO: put this in subparser
         self.parser.add_argument('--write_config', '-wc',
                                  nargs='?',
                                  metavar='FILENAME',
-                                 const='stdout')
+                                 const='stdout',
+                                 help="print script options to screen in JSON format"
+                                      " add FILENAME to write to a file")
 
     def parse_args(self, *args, **kwargs):
 
