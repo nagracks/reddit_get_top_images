@@ -3,7 +3,7 @@
 
 __author__    = "nagracks"
 __date__      = "13-08-2016"
-__license__   = "GPL3"
+__license__   = "MIT"
 __copyright__ = "Copyright © 2016 nagracks"
 
 import os

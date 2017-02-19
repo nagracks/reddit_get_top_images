@@ -71,4 +71,4 @@ LICENSE
 ------
 
 `reddit_get_top_images` is licensed under
-[GPL3](LICENSE)
+[MIT](LICENSE)
