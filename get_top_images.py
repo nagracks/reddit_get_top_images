@@ -20,18 +20,15 @@ __date__      = "18-07-2016"
 __license__   = "MIT"
 __copyright__ = "Copyright © 2016 nagracks"
 
-import os
-import random
-from argparse import ArgumentParser
-
-# External modules
-from bs4 import BeautifulSoup
 import argparse
 import json
+import os
+import sys
+
 import praw
 import requests
-import sys
 import tqdm
+from bs4 import BeautifulSoup
 
 
 class TopImageRetreiver(object):
@@ -252,7 +249,7 @@ def _parse_args():
     """Parse args with argparse
     :returns: args
     """
-    parser = ArgumentParser(description="Download top pics from any subreddit")
+    parser = argparse.ArgumentParser(description="Download top pics from any subreddit")
 
     parser.add_argument('--subreddit', '-s', 
             default=['earthporn', 'cityporn'], 
