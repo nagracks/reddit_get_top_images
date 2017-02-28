@@ -250,32 +250,42 @@ def _parse_args():
     :returns: args
     """
     parser = argparse.ArgumentParser(description="Download top pics from any subreddit")
-
-    parser.add_argument('--subreddit', '-s', 
+    parser.add_argument(
+            '--subreddit', '-s', 
             default=['earthporn', 'cityporn'], 
             nargs='+', 
-            help="Name of the subreddit")
-
+            help="""
+                Name of the subreddits. Provide as many subreddits you
+                want to download images from.
+            """
+            )
     parser.add_argument('--period', '-p', 
             default='w',
             choices=['h', 'd', 'w', 'm', 'y', 'a'],
-            help="[h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. Period "
-                 "of time from which you want images. Default to "
-                 "'get_top_from_[w]eek'")
-
-    parser.add_argument('--limit', '-l', 
+            help="""
+                [h]our, [d]ay, [w]eek, [m]onth, [y]ear, or [a]ll. Period
+                of time from which you want images. Default to
+                'get_top_from_[w]eek'
+            """
+            )
+    parser.add_argument(
+            '--limit', '-l', 
             metavar='N', 
             type=int,
             default=15, 
-            help="Maximum URL limit per subreddit. Defaults to 15")
-
-    parser.add_argument('--destination', '-d', 
+            help="""
+                Maximum URL limit per subreddit. Defaults to 15
+            """
+            )
+    parser.add_argument(
+            '--destination', '-d', 
             dest='dst',
-            help="Destination path. By default it saves to $HOME/reddit_pics")
-
+            help="""
+                Destination path. By default it saves to $HOME/reddit_pics
+            """
+            )
     # Add the config stuff
     argconfig = ArgumentConfig(parser)
-
     return argconfig.parse_args()
 
 
