@@ -245,10 +245,15 @@ def _links_from_imgur(url):
             pass
 
 
-def _parse_args():
-    """Parse args with argparse
-    :returns: args
-    """
+if __name__ == "__main__":
+    # Handle control+c nicely
+    import signal
+    def exit_(signum, frame):
+        os.sys.exit(1)
+    signal.signal(signal.SIGINT, exit_)
+
+
+    # Commandline args
     parser = argparse.ArgumentParser(description="Download top pics from any subreddit")
     parser.add_argument(
             '--subreddit', '-s',
@@ -286,18 +291,7 @@ def _parse_args():
             )
     # Add the config stuff
     argconfig = ArgumentConfig(parser)
-    return argconfig.parse_args()
-
-
-if __name__ == "__main__":
-    # Handle control+c nicely
-    import signal
-    def exit_(signum, frame):
-        os.sys.exit(1)
-    signal.signal(signal.SIGINT, exit_)
-
-    # Commandline args
-    args = _parse_args()
+    args =  argconfig.parse_args()
 
     for subreddit in args.subreddit:
         tir = TopImageRetreiver(subreddit, args.limit, args.period, args.dst)
