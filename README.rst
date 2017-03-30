@@ -17,12 +17,11 @@ The script will create a folder in your $home directory called
 Usage
 -----
 
-.. image:: https://zippy.gfycat.com/CelebratedLimpingFallowdeer.gif
-
-
 .. code-block:: bash
 
     $ python get_top_images.py -s getmotivated -p w
+
+.. image:: https://zippy.gfycat.com/CelebratedLimpingFallowdeer.gif
 
 Contributing
 ------------
