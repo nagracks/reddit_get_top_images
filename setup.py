@@ -20,7 +20,7 @@ setup(
     url='https://github.com/nagracks/reddit_get_top_images',
     download_url='https://github.com/nagracks/reddit_get_top_images/archive/v0.1.0.tar.gz',
 
-    keywords=['reddit', 'script', 'download', 'images'],
+    keywords='reddit script download top images',
 
     scripts=['get_top_images.py'],
     install_requires=requirements,
