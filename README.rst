@@ -1,9 +1,6 @@
 Reddit get top images
 ===============================
 
-.. image:: https://badges.gitter.im/nagracks/reddit_get_top_images.svg
-        :target: https://gitter.im/nagracks/reddit_get_top_images?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-        :alt: Gitter
 
 `reddit_get_top_images` is a script that can be used to download all the
 top images from any subreddit of http://www.reddit.com.
