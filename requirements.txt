@@ -2,7 +2,7 @@ beautifulsoup4==4.4.1
 bs4==0.0.1
 decorator==4.0.10
 praw==3.5.0
-requests==2.10.0
+requests==2.20.0
 six==1.10.0
 tqdm==4.7.6
 update-checker==0.11
